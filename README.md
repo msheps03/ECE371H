@@ -5,6 +5,10 @@ Daniel Lacayo & Maxwell Shepherd
 
 Training a machine learning algorithm on the german traffic dataset and determining how obfuscated images are then detected
 
+Github for image manipulation:
+
+
+
 **Downloads for installing GTSRB analysis tool:**
 
   qt5.11.3: https://download.qt.io/new_archive/qt/5.11/5.11.3/
