@@ -161,10 +161,17 @@ print("Accuracy: ",accuracy_score(label, Y_pred))
 plot,prediction = test_on_img(r'./Train/40/00040_00011_00026.png')
 s = [str(i) for i in prediction]
 a = int("".join(s))
-print("Predicted traffic sign is: ", classes_dict[a])
+title = "Predicted traffic sign is: {}".format(classes_dict[a])
+plt.imshow(plot)
+plt.title(title, fontsize='16')
+plt.show()
 
 # test on an rotated (slanted) image
 plot,prediction = test_on_img(r'./output/319.jpg')
 s = [str(i) for i in prediction]
 a = int("".join(s))
-print("Predicted traffic sign is: ", classes_dict[a])
+title = "Manipulated\nPredicted traffic sign is: {}".format(classes_dict[a])
+plt.imshow(plot)
+plt.title(title, fontsize='16')
+
+plt.show()
