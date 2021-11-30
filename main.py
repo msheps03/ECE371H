@@ -152,29 +152,28 @@ def build_model():
 model = load_model('./training/TSR.h5')
 
 # testing
-X_test, label = testing('Test.csv')
-predict_x=model.predict(X_test)
-Y_pred=np.argmax(predict_x,axis=1)
-print("Accuracy with Test.csv: {:.2%}".format(accuracy_score(label, Y_pred)))
+def testcsv(filename='Test.csv'):
+    X_test, label = testing(filename)
+    predict_x=model.predict(X_test)
+    Y_pred=np.argmax(predict_x,axis=1)
+    print("Accuracy with Test.csv: {:.2%}".format(accuracy_score(label, Y_pred)))
+    return
 
-# test on an image
-plot,prediction,confidence = test_on_img(r'./Train/40/00040_00011_00026.png')
-s = [str(i) for i in prediction]
-a = int("".join(s))
-percent_confidence = confidence[0][np.argmax(confidence)]
-title = "Predicted class: {}\nConfidence: {:.2%}".format(classes_dict[a],percent_confidence)
-plt.imshow(plot)
-plt.title(title, fontsize='12')
-plt.show()
+# test on an image and graph the resulting class with confidence level
+# ex graph_img_test('Train/40/00040_00011_00029.png')
+# ex graph_img_test('Test/12629.png')
+def graph_img_test(img_file=None):
+    if img_file == None:
+        print("Please provide an image from Test/")
+        return
+    plot,prediction,confidence = test_on_img(r'./{}'.format(img_file))
+    s = [str(i) for i in prediction]
+    a = int("".join(s))
+    percent_confidence = confidence[0][np.argmax(confidence)]
+    title = "Predicted class: {}\nConfidence: {:.2%}".format(classes_dict[a],percent_confidence)
+    plt.imshow(plot)
+    plt.title(title, fontsize='12')
+    plt.show()
+    return
 
-# test on an rotated (slanted) image
-plot,prediction,confidence = test_on_img(r'./output/319.jpg')
-s = [str(i) for i in prediction]
-a = int("".join(s))
-percent_confidence = confidence[0][np.argmax(confidence)]
-title = "Manipulated\nPredicted class: {}\nConfidence: {:.2%}".format(classes_dict[a],percent_confidence)
-plt.imshow(plot)
-plt.title(title, fontsize='12')
-plt.legend([percent_confidence])
-
-plt.show()
+graph_img_test('output/319.jpg')
