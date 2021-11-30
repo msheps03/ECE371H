@@ -39,14 +39,15 @@ main.py: https://gist.github.com/AxelThevenot/562bde5f7af6c3c4e44521359aa71b28#f
 
   https://towardsdatascience.com/installing-tensorflow-with-cuda-cudnn-and-gpu-support-on-windows-10-60693e46e781
 
-Pip stuff:
-Open a terminal in the project directory and..
 
-Install pipenv
-$pip install pipenv
-Start a virtual environment specific to this project
-$pipenv shell
-Install all packages from pipfile to the virtual environment
-$pipenv install
-Run the program
-$python3 main.py
+## Set-up and Installation
+This project utilizes `pipenv`, the package manager. Open a terminal in the project directory and..
+
+1. Install pipenv
+`pip install pipenv`
+2. Start a virtual environment specific to this project
+`pipenv shell`
+3. Install all packages from pipfile to the virtual environment
+`pipenv install`
+
+ Type `python3 main.py` to execute the program.
