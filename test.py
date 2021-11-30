@@ -1,11 +1,16 @@
-from sklearn.metrics import accuracy_score
-import os
-from keras.models import load_model
-from PIL import Image
+
+
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
+import os
+import cv2
+import tensorflow as tf
+from PIL import Image
+from sklearn.metrics import accuracy_score
+from keras.models import Sequential, load_model
 
-
+os.chdir('D:/new371H/newECE371git/ECE371H')
 # Classes of trafic signs
 class_list = { 0:'Speed limit (20km/h)',
             1:'Speed limit (30km/h)', 
@@ -56,39 +61,39 @@ def testing(testcsv):
     y_test = pd.read_csv(testcsv)
     label = y_test["ClassId"].values
     imgs = y_test["Path"].values
-    data=[]
+    data = []
     for img in imgs:
         image = Image.open(img)
-        image = image.resize((30,30))
+        image = image.resize((30, 30))
         data.append(np.array(image))
-    X_test=np.array(data)
-    return X_test,label
-    
+    X_test = np.array(data)
+    return X_test, label
+
+
 def test_on_img(img):
-    data=[]
+    data = []
     image = Image.open(img)
-    image = image.resize((30,30))
+    image = image.resize((30, 30))
     data.append(np.array(image))
-    X_test=np.array(data)
-    Y_pred = model.predict_classes(X_test)
-    return image,Y_pred
-
-X_test, label = testing('Test.csv')
-
-Y_pred = model.predict_classes(X_test)
-Y_pred
-
-print(accuracy_score(label, Y_pred))
-
-model.save("./training/TSR.h5")
-
-os.chdir(r'D:/new371H/371H')
+    X_test = np.array(data)
+    predict_x = model.predict(X_test)
+    Y_pred = np.argmax(predict_x, axis=1)
+    return image, Y_pred
 
 model = load_model('./training/TSR.h5')
+X_test, label = testing('Test.csv')
 
-plot,prediction = test_on_img(r'D:/new371H/ECE371H/Test/00500.png')
-s = [str(i) for i in prediction] 
-a = int("".join(s)) 
-print("Predicted traffic sign is: ", class_list[a])
-plt.imshow(plot)
-plt.show()
+predict_x= model.predict(X_test)
+Y_pred = np.argmax(predict_x,axis=1)
+
+print("Model Accuracy: ", accuracy_score(label, Y_pred))
+
+for i in range(10):
+    #current_file = './Test/' + f"{1:02d}" + '.png'
+    plot,prediction = test_on_img(r'./Test/' + f"{i:05d}" + '.png')
+    s = [str(i) for i in prediction]
+    a = int("".join(s))
+    print("Predicted traffic sign is: ", class_list[a], "Actual Traffic Sign: ", label)
+    #print("actual traffic sign is: ", class_list[])
+    plt.imshow(plot)
+    plt.show()
