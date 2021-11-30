@@ -158,7 +158,13 @@ Y_pred=np.argmax(predict_x,axis=1)
 print("Accuracy: ",accuracy_score(label, Y_pred))
 
 # test on an image
-plot,prediction = test_on_img(r'Test/00500.png')
+plot,prediction = test_on_img(r'./Train/40/00040_00011_00026.png')
+s = [str(i) for i in prediction]
+a = int("".join(s))
+print("Predicted traffic sign is: ", classes_dict[a])
+
+# test on an rotated (slanted) image
+plot,prediction = test_on_img(r'./output/319.jpg')
 s = [str(i) for i in prediction]
 a = int("".join(s))
 print("Predicted traffic sign is: ", classes_dict[a])
