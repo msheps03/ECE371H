@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 
 # Classes of trafic signs
-classes = { 0:'Speed limit (20km/h)',
+class_list = { 0:'Speed limit (20km/h)',
             1:'Speed limit (30km/h)', 
             2:'Speed limit (50km/h)', 
             3:'Speed limit (60km/h)', 
@@ -73,7 +73,6 @@ def test_on_img(img):
     Y_pred = model.predict_classes(X_test)
     return image,Y_pred
 
-
 X_test, label = testing('Test.csv')
 
 Y_pred = model.predict_classes(X_test)
@@ -83,13 +82,13 @@ print(accuracy_score(label, Y_pred))
 
 model.save("./training/TSR.h5")
 
-os.chdir(r'D:\archive')
+os.chdir(r'D:/new371H/371H')
 
 model = load_model('./training/TSR.h5')
 
-plot,prediction = test_on_img(r'D:\archive\Test\00500.png')
+plot,prediction = test_on_img(r'D:/new371H/ECE371H/Test/00500.png')
 s = [str(i) for i in prediction] 
 a = int("".join(s)) 
-print("Predicted traffic sign is: ", classes[a])
+print("Predicted traffic sign is: ", class_list[a])
 plt.imshow(plot)
 plt.show()

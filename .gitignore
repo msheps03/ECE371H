@@ -1,4 +1,8 @@
 Train/
 Test/
 Meta/
+.idea/
+.pytest_cache/
+training/data.npy
+training/target.npy
 .DS_Store
