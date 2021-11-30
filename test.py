@@ -87,13 +87,20 @@ predict_x= model.predict(X_test)
 Y_pred = np.argmax(predict_x,axis=1)
 
 print("Model Accuracy: ", accuracy_score(label, Y_pred))
+showImage = 0
+correct = [0, 0]
 
-for i in range(10):
-    #current_file = './Test/' + f"{1:02d}" + '.png'
-    plot,prediction = test_on_img(r'./Test/' + f"{i:05d}" + '.png')
+for i in range(12629):
+    plot,prediction = test_on_img(r'./45_deg_TEST/' + f"{i:05d}" + '.png')
     s = [str(i) for i in prediction]
     a = int("".join(s))
-    print("Predicted traffic sign is: ", class_list[a], "Actual Traffic Sign: ", label)
-    #print("actual traffic sign is: ", class_list[])
-    plt.imshow(plot)
-    plt.show()
+    if class_list[a] == class_list[label[i]]:
+        correct[0] += 1
+    else:
+        print("Predicted traffic sign is: ", class_list[a], "\tActual Traffic Sign: ", class_list[label[i]])
+    correct[1] += 1
+    if showImage:
+        plt.imshow(plot)
+        plt.show()
+
+print("Correctly Identified: ", 100*(correct[0]/correct[1]), "%")

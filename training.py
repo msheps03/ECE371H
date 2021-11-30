@@ -60,30 +60,6 @@ class_list = {0: 'Speed limit (20km/h)',
               42: 'End no passing veh > 3.5 tons'
               }
 
-
-def testing(testcsv):
-    y_test = pd.read_csv(testcsv)
-    label = y_test["ClassId"].values
-    imgs = y_test["Path"].values
-    data = []
-    for img in imgs:
-        image = Image.open(img)
-        image = image.resize((30, 30))
-        data.append(np.array(image))
-    X_test = np.array(data)
-    return X_test, label
-
-
-def test_on_img(img):
-    data = []
-    image = Image.open(img)
-    image = image.resize((30, 30))
-    data.append(np.array(image))
-    X_test = np.array(data)
-    predict_x = model.predict(X_test)
-    Y_pred = np.argmax(predict_x, axis=1)
-    return image, Y_pred
-
 data = []
 labels = []
 # We have 43 Classes

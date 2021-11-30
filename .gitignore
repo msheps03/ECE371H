@@ -1,6 +1,11 @@
 Train/
 Test/
 Meta/
+30_deg_TEST/
+45_deg_TEST/
+60_deg_TEST/
+75_deg_TEST/
+output/
 .idea/
 .pytest_cache/
 training/data.npy
