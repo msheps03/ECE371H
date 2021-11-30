@@ -124,7 +124,7 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 epochs = 100
 history = model.fit(X_train, y_train, batch_size=32, epochs=epochs, validation_data=(X_test, y_test))
 
-
+model.save("./training/TSR_"+str(epochs)+".h5")
 # accuracy 
 plt.figure(0)
 plt.plot(history.history['accuracy'], label='training accuracy')

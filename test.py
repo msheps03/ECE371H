@@ -80,7 +80,8 @@ def test_on_img(img):
     Y_pred = np.argmax(predict_x, axis=1)
     return image, Y_pred
 
-model = load_model('./training/TSR.h5')
+epochs = input("epochs?: ")
+model = load_model('./training/TSR_'+epochs+'.h5')
 X_test, label = testing('Test.csv')
 
 predict_x= model.predict(X_test)
@@ -89,8 +90,8 @@ Y_pred = np.argmax(predict_x,axis=1)
 print("Model Accuracy: ", accuracy_score(label, Y_pred))
 showImage = 0
 correct = [0, 0]
-
-for i in range(12629):
+images = 12629
+for i in range(images):
     plot,prediction = test_on_img(r'./45_deg_TEST/' + f"{i:05d}" + '.png')
     s = [str(i) for i in prediction]
     a = int("".join(s))

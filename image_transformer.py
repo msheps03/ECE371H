@@ -166,7 +166,8 @@ def main(img_path = "./Train/40/00040_00011_00026.png", rot_range = 320, img_sha
 
 if __name__ == "__main__":
     images = 12629
-    degree = input("Degree?")
+    degree = input("Degree?: ")
+    angle = int(degree) + 270
     for i in range(images):
-        new_image = main(r'./Test/' + f"{i:05d}" + '.png', 315)
+        new_image = main(r'./Test/' + f"{i:05d}" + '.png', angle)
         cv2.imwrite(r'./'+degree+'_deg_TEST/' + f"{i:05d}" + '.png', new_image)
