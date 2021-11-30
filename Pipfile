@@ -8,6 +8,7 @@ matplotlib = "*"
 pandas = "*"
 tensorflow = "*"
 opencv-python = "*"
+sklearn = "*"
 
 [dev-packages]
 
