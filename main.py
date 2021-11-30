@@ -32,7 +32,7 @@ def test_on_img(img):
     predict_x=model.predict(X_test)
     Y_pred=np.argmax(predict_x,axis=1)
     # Y_pred = model.predict_classes(X_test)
-    return image,Y_pred
+    return image,Y_pred,predict_x
 
 # Classes of trafic signs
 classes_dict = { 0:'Speed limit (20km/h)',
@@ -155,23 +155,26 @@ model = load_model('./training/TSR.h5')
 X_test, label = testing('Test.csv')
 predict_x=model.predict(X_test)
 Y_pred=np.argmax(predict_x,axis=1)
-print("Accuracy: ",accuracy_score(label, Y_pred))
+print("Accuracy with Test.csv: {:.2%}".format(accuracy_score(label, Y_pred)))
 
 # test on an image
-plot,prediction = test_on_img(r'./Train/40/00040_00011_00026.png')
+plot,prediction,confidence = test_on_img(r'./Train/40/00040_00011_00026.png')
 s = [str(i) for i in prediction]
 a = int("".join(s))
-title = "Predicted traffic sign is: {}".format(classes_dict[a])
+percent_confidence = confidence[0][np.argmax(confidence)]
+title = "Predicted class: {}\nConfidence: {:.2%}".format(classes_dict[a],percent_confidence)
 plt.imshow(plot)
-plt.title(title, fontsize='16')
+plt.title(title, fontsize='12')
 plt.show()
 
 # test on an rotated (slanted) image
-plot,prediction = test_on_img(r'./output/319.jpg')
+plot,prediction,confidence = test_on_img(r'./output/319.jpg')
 s = [str(i) for i in prediction]
 a = int("".join(s))
-title = "Manipulated\nPredicted traffic sign is: {}".format(classes_dict[a])
+percent_confidence = confidence[0][np.argmax(confidence)]
+title = "Manipulated\nPredicted class: {}\nConfidence: {:.2%}".format(classes_dict[a],percent_confidence)
 plt.imshow(plot)
-plt.title(title, fontsize='16')
+plt.title(title, fontsize='12')
+plt.legend([percent_confidence])
 
 plt.show()
