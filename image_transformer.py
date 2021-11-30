@@ -150,12 +150,15 @@ for ang in range(0, rot_range):
 
     """ Example of rotating an image along x-axis from 0 to 360 degree
         with a 5 pixel shift in +X direction """
-    rotated_img = it.rotate_along_axis(theta = ang, dy = 5)
+    #rotated_img = it.rotate_along_axis(theta = ang, dx=5)
 
     """ Example of rotating an image along yz-axis from 0 to 360 degree """
     #rotated_img = it.rotate_along_axis(phi = ang, gamma = ang)
 
     """ Example of rotating an image along z-axis(Normal 2D) from 0 to 360 degree """
     #rotated_img = it.rotate_along_axis(gamma = ang)
+
+    """ Example of rotating an image along x and y axis """
+    rotated_img = it.rotate_along_axis(theta = ang, phi = ang)
 
 save_image('output/{}.jpg'.format(str(ang).zfill(3)), rotated_img)
