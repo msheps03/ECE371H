@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import os
 import cv2
 import tensorflow as tf
-
+import csv
 from PIL import Image
 from sklearn.metrics import accuracy_score
 from keras.models import Sequential, load_model
@@ -79,73 +79,40 @@ def test_on_img(img):
     X_test = np.array(data)
     predict_x = model.predict(X_test)
     Y_pred = np.argmax(predict_x, axis=1)
-    return image, Y_pred
+    return image, Y_pred, X_test
 
-def find_confidence_limit(filecsv='Test.csv'):
-    # Make output dir
-    if os.path.isdir('output'):
-        shutil.rmtree('output') # remove the directory if it exists
-    os.mkdir('output')
+#epochs = input("epochs?: ")
 
-    y_test = pd.read_csv(filecsv)
-    imgs = y_test["Path"].values
-    labels = y_test["ClassId"].values
-    # Input image path
-    img_path = imgs[0]
-    # Correct class
-    true_class = labels[0]
-    # Rotation range
-    rot_range = 360
-    # Ideal image shape (w, h)
-    img_shape = None
-    # Instantiate the class
-    it = ImageTransformer(img_path, img_shape)
-    predicted_classes = []
-    predicted_confidence = []
-    # Iterate through rotation range
-    for ang in range(rot_range):
-        # NOTE: Here we can change which angle, axis, shift
-        """ Example of rotating an image along x and y axis """
-        rotated_img = it.rotate_along_axis(theta = ang)
-        save_image('output/{}.jpg'.format(str(ang).zfill(3)), rotated_img)
-        plot,prediction,confidence_array = test_on_img(r'./output/{}.jpg'.format(str(ang).zfill(3)))
-        s = [str(i) for i in prediction]
-        predicted_class = int("".join(s))
-        confidence = confidence_array[0][np.argmax(confidence_array)]
-        predicted_classes.append(predicted_class)
-        predicted_confidence.append(confidence)
-    fig, axs = plt.subplots(2, 1)
-    axs[0].plot(predicted_confidence)
-    axs[0].set_title('Confidence VS Angle of Rotation')
-    axs[1].plot(predicted_classes)
-    axs[1].set_title('Predicted Class VS Angle of Rotation\nTrue Class: {}'.format(true_class))
-    # plt.plot(predicted_classes[confidence])
-    plt.show()
-    return
 
-find_confidence_limit()
-epochs = input("epochs?: ")
-model = load_model('./training/TSR_'+epochs+'.h5')
-X_test, label = testing('Test.csv')
-
-predict_x= model.predict(X_test)
-Y_pred = np.argmax(predict_x,axis=1)
-
-print("Model Accuracy: ", accuracy_score(label, Y_pred))
 showImage = 0
 correct = [0, 0]
-images = 12629
-for i in range(images):
-    plot,prediction = test_on_img(r'./45_deg_TEST/' + f"{i:05d}" + '.png')
-    s = [str(i) for i in prediction]
-    a = int("".join(s))
-    if class_list[a] == class_list[label[i]]:
-        correct[0] += 1
-    else:
-        print("Predicted traffic sign is: ", class_list[a], "\tActual Traffic Sign: ", class_list[label[i]])
-    correct[1] += 1
-    if showImage:
-        plt.imshow(plot)
-        plt.show()
+images = 5
+degree_files = [30, 45, 60, 75]
+epoch_test = [1, 10, 20, 25,50,75,100]
+for epoch in epoch_test:
+    model = load_model('./training/TSR_' + str(epoch) + '.h5')
+    X_test, label = testing('Test.csv')
+
+    predict_x = model.predict(X_test)
+    Y_pred = np.argmax(predict_x, axis=1)
+    for value in degree_files:
+        for i in range(images):
+            plot,prediction, X_test = test_on_img(r'./'+str(value)+'_deg_TEST/' + f"{i:05d}" + '.png')
+            s = [str(i) for i in prediction]
+            a = int("".join(s))
+            if class_list[a] == class_list[label[i]]:
+                correct[0] += 1
+            else:
+                print("Predicted traffic sign is: ", class_list[a], "\tActual Traffic Sign: ", class_list[label[i]])
+            correct[1] += 1
+            if showImage:
+                plt.imshow(plot)
+                plt.show()
+
+    with open("epoch" + str(epoch) + '.csv', 'w', encoding='UTF8', newline='') as f:
+        writer = csv.writer(f)
+        row = [epoch, accuracy_score(label, Y_pred), ] #[epoch, model accuracy, degree, test accuracy]
+        writer.writerow(row)
 
 print("Correctly Identified: ", 100*(correct[0]/correct[1]), "%")
+print("Model Accuracy: ", accuracy_score(label, Y_pred))
