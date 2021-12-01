@@ -121,11 +121,12 @@ model.add(Dense(43, activation='softmax'))
 #Compilation of the model
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
-epochs = 100
+epochs = int(input("epochs?: "))
 history = model.fit(X_train, y_train, batch_size=32, epochs=epochs, validation_data=(X_test, y_test))
 
 model.save("./training/TSR_"+str(epochs)+".h5")
-# accuracy 
+
+#accuracy
 plt.figure(0)
 plt.plot(history.history['accuracy'], label='training accuracy')
 plt.plot(history.history['val_accuracy'], label='val accuracy')
@@ -135,8 +136,7 @@ plt.ylabel('accuracy')
 plt.legend()
 plt.show()
 
-
-# Loss
+#Loss
 plt.plot(history.history['loss'], label='training loss')
 plt.plot(history.history['val_loss'], label='val loss')
 plt.title('Loss')
