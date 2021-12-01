@@ -60,6 +60,8 @@ class_list = {0: 'Speed limit (20km/h)',
               42: 'End no passing veh > 3.5 tons'
               }
 
+
+
 data = []
 labels = []
 # We have 43 Classes
