@@ -3,7 +3,8 @@ import numpy as np
 import cv2
 import sys
 import os
-
+import shutil
+import pandas as pd
 # Usage:
 #     Change main function with ideal arguments
 #     Then
@@ -104,49 +105,7 @@ class ImageTransformer(object):
         # Final transformation matrix
         return np.dot(A2, np.dot(T, np.dot(R, A1)))
 
-def find_confidence_limit(filecsv='Test.csv'):
-    # Make output dir
-    if os.path.isdir('output'):
-        shutil.rmtree('output') # remove the directory if it exists
-    os.mkdir('output')
 
-    y_test = pd.read_csv(filecsv)
-    imgs = y_test["Path"].values
-    labels = y_test["ClassId"].values
-    # Input image path
-    img_path = imgs[0]
-    # Correct class
-    true_class = labels[0]
-    # Rotation range
-    rot_range = 360
-    # Ideal image shape (w, h)
-    img_shape = None
-    # Instantiate the class
-    it = ImageTransformer(img_path, img_shape)
-    predicted_classes = []
-    predicted_confidence = []
-    # Iterate through rotation range
-    for ang in range(rot_range):
-        # NOTE: Here we can change which angle, axis, shift
-        """ Example of rotating an image along x and y axis """
-        rotated_img = it.rotate_along_axis(theta = ang)
-        save_image('output/{}.jpg'.format(str(ang).zfill(3)), rotated_img)
-        plot,prediction,confidence_array = test_on_img(r'./output/{}.jpg'.format(str(ang).zfill(3)))
-        s = [str(i) for i in prediction]
-        predicted_class = int("".join(s))
-        confidence = confidence_array[0][np.argmax(confidence_array)]
-        predicted_classes.append(predicted_class)
-        predicted_confidence.append(confidence)
-    fig, axs = plt.subplots(2, 1)
-    axs[0].plot(predicted_confidence)
-    axs[0].set_title('Confidence VS Angle of Rotation')
-    axs[1].plot(predicted_classes)
-    axs[1].set_title('Predicted Class VS Angle of Rotation\nTrue Class: {}'.format(true_class))
-    # plt.plot(predicted_classes[confidence])
-    plt.show()
-    return
-
-find_confidence_limit()
 # Usage:
 #     Change main function with ideal arguments
 #     then
@@ -168,7 +127,7 @@ find_confidence_limit()
 # Output:
 #     image     : the rotated image
 
-def main(img_path = "./Train/40/00040_00011_00026.png", rot_range = 320, img_shape = None, save_location='output'):
+def manipulate(img_path = "./Train/40/00040_00011_00026.png", rot_range = 320, img_shape = None, save_location='output'):
     '''# Input image path
     img_path = "./Train/40/00040_00011_00026.png"
 
@@ -206,10 +165,10 @@ def main(img_path = "./Train/40/00040_00011_00026.png", rot_range = 320, img_sha
     #cv2.imwrite(save_location'/{}.png'.format(str(ang).zfill(3)), rotated_img)
     return rotated_img
 
-if __name__ == "__main__":
-    images = 12629
-    degree = input("Degree?: ")
-    angle = int(degree) + 270
-    for i in range(images):
-        new_image = main(r'./Test/' + f"{i:05d}" + '.png', angle)
-        cv2.imwrite(r'./'+degree+'_deg_TEST/' + f"{i:05d}" + '.png', new_image)
+'''images = 12629
+degree = input("Degree?: ")
+angle = int(degree) + 270
+for i in range(images):
+    new_image = manipulate(r'./Test/' + f"{i:05d}" + '.png', angle)
+    cv2.imwrite(r'./'+degree+'_deg_TEST/' + f"{i:05d}" + '.png', new_image)'''
+
