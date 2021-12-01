@@ -150,7 +150,7 @@ def build_model():
 # build_model()
 
 # load model
-model = load_model('./training/TSR.h5')
+model = load_model('./training/TSR_100.h5')
 
 # testing
 def testcsv(filename='Test.csv'):
@@ -180,8 +180,11 @@ def graph_img_test(img_file=None):
     return
 
 # graph_img_test('output/319.jpg')
-
-# increments the angle of rotation to find where the model begins to misclassify manipulated images
+"""
+Increments the angle of rotation to find where the model
+begins to misclassify manipulated images. Looks at the first 3
+images/classes from Test.csv
+"""
 def find_confidence_limit(filecsv='Test.csv'):
     # Make output dir
     if os.path.isdir('output'):
@@ -191,37 +194,45 @@ def find_confidence_limit(filecsv='Test.csv'):
     y_test = pd.read_csv(filecsv)
     imgs = y_test["Path"].values
     labels = y_test["ClassId"].values
-    # Input image path
-    img_path = imgs[0]
-    # Correct class
-    true_class = labels[0]
     # Rotation range
-    rot_range = 360
+    rot_range = 180
     # Ideal image shape (w, h)
     img_shape = None
-    # Instantiate the class
-    it = ImageTransformer(img_path, img_shape)
-    predicted_classes = []
-    predicted_confidence = []
-    # Iterate through rotation range
-    for ang in range(rot_range):
-        # NOTE: Here we can change which angle, axis, shift
-        """ Example of rotating an image along x and y axis """
-        rotated_img = it.rotate_along_axis(theta = ang)
-        save_image('output/{}.jpg'.format(str(ang).zfill(3)), rotated_img)
-        plot,prediction,confidence_array = test_on_img(r'./output/{}.jpg'.format(str(ang).zfill(3)))
-        s = [str(i) for i in prediction]
-        predicted_class = int("".join(s))
-        confidence = confidence_array[0][np.argmax(confidence_array)]
-        predicted_classes.append(predicted_class)
-        predicted_confidence.append(confidence)
-    fig, axs = plt.subplots(2, 1)
-    axs[0].plot(predicted_confidence)
-    axs[0].set_title('Confidence VS Angle of Rotation')
-    axs[1].plot(predicted_classes)
-    axs[1].set_title('Predicted Class VS Angle of Rotation\nTrue Class: {}'.format(true_class))
-    # plt.plot(predicted_classes[confidence])
-    plt.show()
+    for i in range(3):
+        # Input image path
+        img_path = imgs[i]
+        # Correct class
+        true_class = labels[i]
+        # Instantiate the class
+        it = ImageTransformer(img_path, img_shape)
+        predicted_classes = []
+        predicted_confidence = []
+        # Iterate through rotation range
+        for ang in range(rot_range):
+            # NOTE: Here we can change which angle, axis, shift
+            """ Example of rotating an image along x and y axis """
+            rotated_img = it.rotate_along_axis(theta = ang)
+            save_image('output/{}.jpg'.format(str(ang).zfill(3)), rotated_img)
+            plot,prediction,confidence_array = test_on_img(r'./output/{}.jpg'.format(str(ang).zfill(3)))
+            s = [str(i) for i in prediction]
+            predicted_class = int("".join(s))
+            confidence = confidence_array[0][np.argmax(confidence_array)]
+            predicted_classes.append(predicted_class)
+            predicted_confidence.append(confidence)
+        fig, (ax1, ax2) = plt.subplots(2, 1)
+        # fig.subplots_adjust(hspace=0.5)
+        ax1.plot(predicted_confidence)
+        ax1.set_title('Confidence VS Angle of Rotation', fontsize='20')
+        ax1.set_ylabel('Confidence', fontsize='16')
+        ax1.grid(True)
+        ax2.plot(predicted_classes, color='red')
+        ax2.set_title('Predicted Class VS Angle of Rotation\nTrue Class: {}'.format(true_class), fontsize='20')
+        ax2.set_ylabel('Predicted Class', fontsize='16')
+        ax2.grid(True)
+        plt.xlabel('Angle of Rotation', fontsize='18')
+        plt.suptitle('Comparing Confidence and Predicted Class\nfor a Model with 100 Epochs', fontsize='24')
+        plt.tight_layout()
+        plt.show()
     return
 
 find_confidence_limit()
