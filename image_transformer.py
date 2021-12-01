@@ -165,10 +165,17 @@ def manipulate(img_path = "./Train/40/00040_00011_00026.png", rot_range = 320, i
     #cv2.imwrite(save_location'/{}.png'.format(str(ang).zfill(3)), rotated_img)
     return rotated_img
 
-'''images = 12629
+classes = 43
+sets = 7
+images = 30
 degree = input("Degree?: ")
 angle = int(degree) + 270
-for i in range(images):
-    new_image = manipulate(r'./Test/' + f"{i:05d}" + '.png', angle)
-    cv2.imwrite(r'./'+degree+'_deg_TEST/' + f"{i:05d}" + '.png', new_image)'''
+for j in range(classes):
+    if os.path.isdir('./newTrain/' + str(j)):
+        shutil.rmtree('./newTrain/' + str(j))  # remove the directory if it exists
+    os.mkdir('./newTrain/' + str(j))
+    for x in range(sets):
+        for i in range(images):
+            new_image = manipulate(r'./Train/' +str(j) +"/"+ f"{j:05d}" + "_" + f"{x:05d}" + "_" + f"{i:05d}" + '.png', angle)
+            cv2.imwrite(r'./newTrain/'+str(j) +"/"+ f"{j:05d}" + "_" + f"{x:05d}" + "_" + f"{i:05d}" + '.png', new_image)
 

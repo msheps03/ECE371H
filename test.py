@@ -102,17 +102,17 @@ for epoch in epoch_test:
             a = int("".join(s))
             if class_list[a] == class_list[label[i]]:
                 correct[0] += 1
-            else:
-                print("Predicted traffic sign is: ", class_list[a], "\tActual Traffic Sign: ", class_list[label[i]])
+            #else:
+                # print("Predicted traffic sign is: ", class_list[a], "\tActual Traffic Sign: ", class_list[label[i]])
             correct[1] += 1
             if showImage:
                 plt.imshow(plot)
                 plt.show()
 
-    with open("epoch" + str(epoch) + '.csv', 'w', encoding='UTF8', newline='') as f:
-        writer = csv.writer(f)
-        row = [epoch, accuracy_score(label, Y_pred), ] #[epoch, model accuracy, degree, test accuracy]
-        writer.writerow(row)
+        with open('data.csv', 'a', encoding='UTF8', newline='') as f:
+            writer = csv.writer(f)
+            row = [epoch, accuracy_score(label, Y_pred), value, 100*(correct[0]/correct[1])] #[epoch, model accuracy, degree, test accuracy]
+            writer.writerow(row)
 
-print("Correctly Identified: ", 100*(correct[0]/correct[1]), "%")
-print("Model Accuracy: ", accuracy_score(label, Y_pred))
+'''rint("Correctly Identified: ", 100*(correct[0]/correct[1]), "%")
+print("Model Accuracy: ", accuracy_score(label, Y_pred))'''
