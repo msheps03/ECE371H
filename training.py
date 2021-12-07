@@ -1,5 +1,3 @@
-
-
 import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
@@ -7,143 +5,127 @@ import cv2
 import tensorflow as tf
 from PIL import Image
 import os
-os.chdir('D:/new371H/newECE371git/ECE371H')
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.utils import to_categorical
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPool2D, Dense, Flatten, Dropout
 
-# Classes of trafic signs
-class_list = {0: 'Speed limit (20km/h)',
-              1: 'Speed limit (30km/h)',
-              2: 'Speed limit (50km/h)',
-              3: 'Speed limit (60km/h)',
-              4: 'Speed limit (70km/h)',
-              5: 'Speed limit (80km/h)',
-              6: 'End of speed limit (80km/h)',
-              7: 'Speed limit (100km/h)',
-              8: 'Speed limit (120km/h)',
-              9: 'No passing',
-              10: 'No passing veh over 3.5 tons',
-              11: 'Right-of-way at intersection',
-              12: 'Priority road',
-              13: 'Yield',
-              14: 'Stop',
-              15: 'No vehicles',
-              16: 'Veh > 3.5 tons prohibited',
-              17: 'No entry',
-              18: 'General caution',
-              19: 'Dangerous curve left',
-              20: 'Dangerous curve right',
-              21: 'Double curve',
-              22: 'Bumpy road',
-              23: 'Slippery road',
-              24: 'Road narrows on the right',
-              25: 'Road work',
-              26: 'Traffic signals',
-              27: 'Pedestrians',
-              28: 'Children crossing',
-              29: 'Bicycles crossing',
-              30: 'Beware of ice/snow',
-              31: 'Wild animals crossing',
-              32: 'End speed + passing limits',
-              33: 'Turn right ahead',
-              34: 'Turn left ahead',
-              35: 'Ahead only',
-              36: 'Go straight or right',
-              37: 'Go straight or left',
-              38: 'Keep right',
-              39: 'Keep left',
-              40: 'Roundabout mandatory',
-              41: 'End of no passing',
-              42: 'End no passing veh > 3.5 tons'
-              }
+
+def pre_process(degree):
+    os.chdir('D:/new371H/newECE371git/ECE371H')
+    data = []
+    labels = []
+    # We have 43 Classes
+    classes = 43
+    cur_path = os.getcwd()
+
+    for i in range(classes):
+        if degree == 90:
+            path = os.path.join(cur_path,'Train',str(i))
+        else:
+            path = os.path.join(cur_path,'newTrain',str(i))
+
+        images = os.listdir(path)
+        for a in images:
+            try:
+                image = Image.open(path + '\\'+ a)
+                image = image.resize((30,30))
+                image = np.array(image)
+                data.append(image)
+                labels.append(i)
+            except Exception as e:
+                print(e)
+
+    data = np.array(data)
+    labels = np.array(labels)
+    if os.path.isdir('training'):
+        pass
+    else:
+        os.mkdir('training')
+
+    np.save('./training/data',data)
+    np.save('./training/target',labels)
+    return
 
 
+def build_model(epochs, degree =90, plot = 0):
+    pre_process(degree)
+    data=np.load('./training/data.npy')
+    labels=np.load('./training/target.npy')
 
-data = []
-labels = []
-# We have 43 Classes
-classes = 43
-cur_path = os.getcwd()
+    print(data.shape, labels.shape)
 
-for i in range(classes):
-    path = os.path.join(cur_path,'train',str(i))
-    images = os.listdir(path)
-    for a in images:
-        try:
-            image = Image.open(path + '\\'+ a)
-            image = image.resize((30,30))
-            image = np.array(image)
-            data.append(image)
-            labels.append(i)
-        except Exception as e:
-            print(e)
-            
+    X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=0)
 
-data = np.array(data)
-labels = np.array(labels)
-
-# os.mkdir('training')
-
-np.save('./training/data',data)
-np.save('./training/target',labels)
-
-data=np.load('./training/data.npy')
-labels=np.load('./training/target.npy')
-
-print(data.shape, labels.shape)
-
-X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=0.2, random_state=0)
-
-print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
+    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
 
 
-y_train = to_categorical(y_train, 43)
-y_test = to_categorical(y_test, 43)
+    y_train = to_categorical(y_train, 43)
+    y_test = to_categorical(y_test, 43)
 
-# building model
-model = Sequential()
-model.add(Conv2D(filters=32, kernel_size=(5,5), activation='relu', input_shape=X_train.shape[1:]))
-model.add(Conv2D(filters=32, kernel_size=(5,5), activation='relu'))
-model.add(MaxPool2D(pool_size=(2, 2)))
-model.add(Dropout(rate=0.25))
-model.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu'))
-model.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu'))
-model.add(MaxPool2D(pool_size=(2, 2)))
-model.add(Dropout(rate=0.25))
-model.add(Flatten())
-model.add(Dense(256, activation='relu'))
-model.add(Dropout(rate=0.5))
-# We have 43 classes that's why we have defined 43 in the dense
-model.add(Dense(43, activation='softmax'))
+    # building model
+    if degree == 90:
+        model = Sequential()
+        model.add(Conv2D(filters=32, kernel_size=(5,5), activation='relu', input_shape=X_train.shape[1:]))
+        model.add(Conv2D(filters=32, kernel_size=(5,5), activation='relu'))
+        model.add(MaxPool2D(pool_size=(2, 2)))
+        model.add(Dropout(rate=0.25))
+        model.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu'))
+        model.add(Conv2D(filters=64, kernel_size=(3, 3), activation='relu'))
+        model.add(MaxPool2D(pool_size=(2, 2)))
+        model.add(Dropout(rate=0.25))
+        model.add(Flatten())
+        model.add(Dense(256, activation='relu'))
+        model.add(Dropout(rate=0.5))
+        # We have 43 classes that's why we have defined 43 in the dense
+        model.add(Dense(43, activation='softmax'))
+    else:
+        model = load_model("./training/TSR_" + str(epochs) + ".h5")
+
+    #Compilation of the model
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+    history = model.fit(X_train, y_train, batch_size=32, epochs=epochs, validation_data=(X_test, y_test))
+    if degree != 90:
+        degree = "_" + str(degree)
+        model.save("./training/TSR_" + str(epochs) + degree + ".h5")
+    else:
+        model.save("./training/TSR_" + str(epochs) + ".h5")
+
+    if plot:
+        plot_accuracy(history, epochs, degree)
+        plot_loss(history, epochs, degree)
+
+    return
 
 
-#Compilation of the model
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+def plot_accuracy(history, epochs, degree):
+    #accuracy
+    plt.figure(0)
+    plt.plot(history.history['accuracy'], label='training accuracy')
+    plt.plot(history.history['val_accuracy'], label='val accuracy')
+    plt.title('Accuracy')
+    plt.xlabel('epochs')
+    plt.ylabel('accuracy')
+    plt.legend()
+    plt.savefig("Accuracy_" + str(epochs) + "_" + str(degree) + ".png")
+    return
 
-epochs = int(input("epochs?: "))
-history = model.fit(X_train, y_train, batch_size=32, epochs=epochs, validation_data=(X_test, y_test))
 
-model.save("./training/TSR_"+str(epochs)+".h5")
+def plot_loss(history, epochs, degree):
+    plt.plot(history.history['loss'], label='training loss')
+    plt.plot(history.history['val_loss'], label='val loss')
+    plt.title('Loss')
+    plt.xlabel('epochs')
+    plt.ylabel('loss')
+    plt.legend()
+    plt.savefig("Loss_" + str(epochs) + "_" + str(degree) + ".png")
+    return
 
-#accuracy
-plt.figure(0)
-plt.plot(history.history['accuracy'], label='training accuracy')
-plt.plot(history.history['val_accuracy'], label='val accuracy')
-plt.title('Accuracy')
-plt.xlabel('epochs')
-plt.ylabel('accuracy')
-plt.legend()
-plt.show()
 
-#Loss
-plt.plot(history.history['loss'], label='training loss')
-plt.plot(history.history['val_loss'], label='val loss')
-plt.title('Loss')
-plt.xlabel('epochs')
-plt.ylabel('loss')
-plt.legend()
-plt.show()
-
+plot = 0
+epoch_test = [1, 10, 20, 25]
+newArray = []
+for epoch in epoch_test:
+    build_model(epoch_test[epoch], 45, 1)

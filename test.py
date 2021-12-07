@@ -79,17 +79,16 @@ def test_on_img(img):
     X_test = np.array(data)
     predict_x = model.predict(X_test)
     Y_pred = np.argmax(predict_x, axis=1)
-    return image, Y_pred, X_test
-
-#epochs = input("epochs?: ")
+    return image, Y_pred, predict_x
 
 
 showImage = 0
 correct = [0, 0]
-images = 5
+images = 12629
 degree_files = ['30_deg_TEST/', '45_deg_TEST/', '60_deg_TEST/', '75_deg_TEST/', 'Test/']
 epoch_test = [1, 10, 20, 25,50,75,100]
-
+confidence = 0
+newArray = []
 for epoch in epoch_test:
     model = load_model('./training/TSR_' + str(epoch) + '.h5')
     X_test, label = testing('Test.csv')
@@ -98,21 +97,23 @@ for epoch in epoch_test:
     Y_pred = np.argmax(predict_x, axis=1)
     for value in degree_files:
         for i in range(images):
-            plot,prediction, X_test = test_on_img(r'./'+str(value) + f"{i:05d}" + '.png')
+            plot,prediction, confidence_array = test_on_img(r'./'+str(value) + f"{i:05d}" + '.png')
             s = [str(i) for i in prediction]
             a = int("".join(s))
             if class_list[a] == class_list[label[i]]:
                 correct[0] += 1
+            confidence = confidence_array[0][np.argmax(confidence_array)]
             #else:
                 # print("Predicted traffic sign is: ", class_list[a], "\tActual Traffic Sign: ", class_list[label[i]])
             correct[1] += 1
             if showImage:
                 plt.imshow(plot)
                 plt.show()
+            newArray.append(confidence)
 
-        with open('data.csv', 'a', encoding='UTF8', newline='') as f:
+        with open('dataxtra.csv', 'a', encoding='UTF8', newline='') as f:
             writer = csv.writer(f)
-            row = [epoch, accuracy_score(label, Y_pred), value, 100*(correct[0]/correct[1])] #[epoch, model accuracy, degree, test accuracy]
+            row = [epoch, accuracy_score(label, Y_pred), value, 100*(correct[0]/correct[1]), sum(newArray)/len(newArray)] #[epoch, model accuracy, degree, test accuracy]
             writer.writerow(row)
 
 '''rint("Correctly Identified: ", 100*(correct[0]/correct[1]), "%")
