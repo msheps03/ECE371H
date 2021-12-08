@@ -81,9 +81,6 @@ classes_dict = { 0:'Speed limit (20km/h)',
             42:'End no passing veh > 3.5 tons' }
 
 
-
-
-
 def pre_process():
     # store data and labels in a list
     data =[]
@@ -139,8 +136,8 @@ def build_model():
 
     #Compilation of the model
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-    # epochs = 20
-    # history = model.fit(X_train, y_train, batch_size=32, epochs=epochs, validation_data=(X_test, y_test))
+    epochs = 20
+    history = model.fit(X_train, y_train, batch_size=32, epochs=epochs, validation_data=(X_test, y_test))
 
     # save model
     model.save("./training/TSR.h5")
@@ -195,7 +192,7 @@ def find_confidence_limit(filecsv='Test.csv'):
     imgs = y_test["Path"].values
     labels = y_test["ClassId"].values
     # Rotation range
-    rot_range = 180
+    rot_range = 360
     # Ideal image shape (w, h)
     img_shape = None
     for i in range(3):
