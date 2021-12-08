@@ -232,7 +232,7 @@ def find_confidence_limit(filecsv='Test.csv'):
         plt.show()
     return
 
-def compare_models(filecsv='Test.csv', model_base=1):
+def compare_models(filecsv='Test.csv', model_base=1, num_img=2):
     # Make output dir
     if os.path.isdir('output'):
         shutil.rmtree('output') # remove the directory if it exists
@@ -245,7 +245,7 @@ def compare_models(filecsv='Test.csv', model_base=1):
     rot_range = 90
     # Ideal image shape (w, h)
     img_shape = None
-    for i in range(200):
+    for i in range(num_img):
         # Input image path
         img_path = imgs[i]
         # Correct class
@@ -266,7 +266,7 @@ def compare_models(filecsv='Test.csv', model_base=1):
             confidence = confidence_array[0][np.argmax(confidence_array)]
             predicted_classes.append(predicted_class)
             predicted_confidence.append(confidence)
-        accuracy = predicted_classes.count(true_class)/rot_range
+        accuracy = round(predicted_classes.count(true_class)/rot_range,3)
         if model_base:
             accuracy_total_base.append(accuracy)
         else:
@@ -279,19 +279,24 @@ accuracy_total_base = []
 accuracy_total_mod = []
 # load model
 model = load_model('./training/TSR_20.h5')
-compare_models()
+compare_models(num_img=200)
 model = load_model('./training/TSR_20_45.h5')
-compare_models(model_base=0)
-comparative_accuracy = sum(accuracy_total_mod)/sum(accuracy_total_base)
-x_axis = list(range(200))
-fig = plt.figure(1)
-plt.plot(x_axis, accuracy_total_base, label="Base Model", color='red') # plot first line
-plt.plot(x_axis, accuracy_total_mod, label="Adversarially Trained Model",color='blue') # plot second line
-plt.title("Comparing Accuracies of Models\non 200 Images Rotated [0,90] from Test Dataset\nAdversarially Trained Model is\n{:.2f}x more Accurate than Base Model".format(comparative_accuracy), fontsize='22')
-plt.xlabel("Test Dataset Images", fontsize='18')
-plt.ylabel("Accuracy", fontsize='18')
-plt.legend(loc="upper right")
-ax = plt.gca()
-ax.set_ylim([0, 1])
-plt.tight_layout()
-plt.show()
+compare_models(model_base=0, num_img=200)
+with open('./compare_models_accuracy/models_e20.csv','w') as file:
+    file.write("image_from_test,base_model_acc,adv_model_acc\n")
+    for a in range(len(accuracy_total_base)):
+        file.write("{},{},{}\n".format(a,accuracy_total_base[a],accuracy_total_mod[a]))
+    file.close()
+# comparative_accuracy = sum(accuracy_total_mod)/sum(accuracy_total_base)
+# x_axis = list(range(len(accuracy_total_mod)))
+# fig = plt.figure(1)
+# plt.plot(x_axis, accuracy_total_base, label="Base Model", color='red') # plot first line
+# plt.plot(x_axis, accuracy_total_mod, label="Adversarially Trained Model",color='blue') # plot second line
+# plt.title("Comparing Accuracies of Models\non 200 Images Rotated [0,90] from Test Dataset\nAdversarially Trained Model is\n{:.2f}x more Accurate than Base Model".format(comparative_accuracy), fontsize='22')
+# plt.xlabel("Test Dataset Images", fontsize='18')
+# plt.ylabel("Accuracy", fontsize='18')
+# plt.legend(loc="upper right")
+# ax = plt.gca()
+# ax.set_ylim([0, 1])
+# plt.tight_layout()
+# plt.show()
