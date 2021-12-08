@@ -125,7 +125,7 @@ def plot_loss(history, epochs, degree):
 
 
 plot = 0
-epoch_test = [1, 10, 20, 25]
+epoch_test = [50, 75, 100]
 newArray = []
 for epoch in epoch_test:
-    build_model(epoch_test[epoch], 45, 1)
+    build_model(epoch, 45, 1)

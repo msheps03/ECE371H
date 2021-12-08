@@ -90,7 +90,7 @@ epoch_test = [1, 10, 20, 25,50,75,100]
 confidence = 0
 newArray = []
 for epoch in epoch_test:
-    model = load_model('./training/TSR_' + str(epoch) + '.h5')
+    model = load_model("./training/TSR_" + str(epoch) + "_45.h5")
     X_test, label = testing('Test.csv')
 
     predict_x = model.predict(X_test)
@@ -111,7 +111,7 @@ for epoch in epoch_test:
                 plt.show()
             newArray.append(confidence)
 
-        with open('dataxtra.csv', 'a', encoding='UTF8', newline='') as f:
+        with open('dataretrained4.csv', 'a', encoding='UTF8', newline='') as f:
             writer = csv.writer(f)
             row = [epoch, accuracy_score(label, Y_pred), value, 100*(correct[0]/correct[1]), sum(newArray)/len(newArray)] #[epoch, model accuracy, degree, test accuracy]
             writer.writerow(row)
