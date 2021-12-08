@@ -140,14 +140,13 @@ def build_model():
     history = model.fit(X_train, y_train, batch_size=32, epochs=epochs, validation_data=(X_test, y_test))
 
     # save model
-    model.save("./training/TSR.h5")
+    model.save("./training/")
     return
 
 # if no model exists, build model, otherwise leave commented out
 # build_model()
 
-# load model
-model = load_model('./training/TSR_100.h5')
+
 
 # testing
 def testcsv(filename='Test.csv'):
@@ -192,7 +191,7 @@ def find_confidence_limit(filecsv='Test.csv'):
     imgs = y_test["Path"].values
     labels = y_test["ClassId"].values
     # Rotation range
-    rot_range = 360
+    rot_range = 90
     # Ideal image shape (w, h)
     img_shape = None
     for i in range(3):
@@ -216,6 +215,7 @@ def find_confidence_limit(filecsv='Test.csv'):
             confidence = confidence_array[0][np.argmax(confidence_array)]
             predicted_classes.append(predicted_class)
             predicted_confidence.append(confidence)
+        accuracy = predicted_classes.count(true_class)/rot_range
         fig, (ax1, ax2) = plt.subplots(2, 1)
         # fig.subplots_adjust(hspace=0.5)
         ax1.plot(predicted_confidence)
@@ -227,9 +227,71 @@ def find_confidence_limit(filecsv='Test.csv'):
         ax2.set_ylabel('Predicted Class', fontsize='16')
         ax2.grid(True)
         plt.xlabel('Angle of Rotation', fontsize='18')
-        plt.suptitle('Comparing Confidence and Predicted Class\nfor a Model with 100 Epochs', fontsize='24')
+        plt.suptitle('Comparing Confidence and Predicted Class\nfor a Model with 100 Epochs\nAccuracy {:.2%}'.format(accuracy), fontsize='24')
         plt.tight_layout()
         plt.show()
     return
 
-find_confidence_limit()
+def compare_models(filecsv='Test.csv', model_base=1):
+    # Make output dir
+    if os.path.isdir('output'):
+        shutil.rmtree('output') # remove the directory if it exists
+    os.mkdir('output')
+
+    y_test = pd.read_csv(filecsv)
+    imgs = y_test["Path"].values
+    labels = y_test["ClassId"].values
+    # Rotation range
+    rot_range = 90
+    # Ideal image shape (w, h)
+    img_shape = None
+    for i in range(200):
+        # Input image path
+        img_path = imgs[i]
+        # Correct class
+        true_class = labels[i]
+        # Instantiate the class
+        it = ImageTransformer(img_path, img_shape)
+        predicted_classes = []
+        predicted_confidence = []
+        # Iterate through rotation range
+        for ang in range(rot_range):
+            # NOTE: Here we can change which angle, axis, shift
+            """ Example of rotating an image along x and y axis """
+            rotated_img = it.rotate_along_axis(theta = ang)
+            save_image('output/{}.jpg'.format(str(ang).zfill(3)), rotated_img)
+            plot,prediction,confidence_array = test_on_img(r'./output/{}.jpg'.format(str(ang).zfill(3)))
+            s = [str(i) for i in prediction]
+            predicted_class = int("".join(s))
+            confidence = confidence_array[0][np.argmax(confidence_array)]
+            predicted_classes.append(predicted_class)
+            predicted_confidence.append(confidence)
+        accuracy = predicted_classes.count(true_class)/rot_range
+        if model_base:
+            accuracy_total_base.append(accuracy)
+        else:
+            accuracy_total_mod.append(accuracy)
+
+        print("{} image completed".format(i))
+    return
+
+accuracy_total_base = []
+accuracy_total_mod = []
+# load model
+model = load_model('./training/TSR_20.h5')
+compare_models()
+model = load_model('./training/TSR_20_45.h5')
+compare_models(model_base=0)
+comparative_accuracy = sum(accuracy_total_mod)/sum(accuracy_total_base)
+x_axis = list(range(200))
+fig = plt.figure(1)
+plt.plot(x_axis, accuracy_total_base, label="Base Model", color='red') # plot first line
+plt.plot(x_axis, accuracy_total_mod, label="Adversarially Trained Model",color='blue') # plot second line
+plt.title("Comparing Accuracies of Models\non 200 Images Rotated [0,90] from Test Dataset\nAdversarially Trained Model is\n{:.2f}x more Accurate than Base Model".format(comparative_accuracy), fontsize='22')
+plt.xlabel("Test Dataset Images", fontsize='18')
+plt.ylabel("Accuracy", fontsize='18')
+plt.legend(loc="upper right")
+ax = plt.gca()
+ax.set_ylim([0, 1])
+plt.tight_layout()
+plt.show()
