@@ -110,6 +110,7 @@ def plot_accuracy(history, epochs, degree):
     plt.ylabel('accuracy')
     plt.legend()
     plt.savefig("Accuracy_" + str(epochs) + "_" + str(degree) + ".png")
+    plt.clf()
     return
 
 
@@ -121,11 +122,12 @@ def plot_loss(history, epochs, degree):
     plt.ylabel('loss')
     plt.legend()
     plt.savefig("Loss_" + str(epochs) + "_" + str(degree) + ".png")
+    plt.clf()
     return
 
 
 plot = 0
-epoch_test = [50, 75, 100]
-newArray = []
+epoch_test = [75,100]
+
 for epoch in epoch_test:
     build_model(epoch, 45, 1)
