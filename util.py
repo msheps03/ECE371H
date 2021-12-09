@@ -27,4 +27,4 @@ def deg_to_rad(deg):
     return deg * pi / 180.0
 
 def rad_to_deg(rad):
-    return deg * 180.0 / pi
+    return rad * 180.0 / pi
